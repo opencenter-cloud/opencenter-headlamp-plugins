@@ -5,7 +5,7 @@ sidebar_label: Plugins Monorepo
 description: Monorepo overview for OpenCenter Headlamp plugins covering setup, development, testing, and CI/CD.
 doc_type: reference
 audience: "platform engineers, plugin developers"
-tags: [headlamp, plugins, monorepo, pnpm]
+tags: [headlamp, plugins, monorepo, bun]
 ---
 
 # OpenCenter Headlamp Plugins
@@ -15,7 +15,7 @@ Monorepo for OpenCenter Headlamp plugins providing custom branding and functiona
 ## Repository Structure
 
 ```
-headlamp-branding-plugin/
+opencenter-headlamp-plugins/
 ├── plugins/
 │   └── branding/              # OpenCenter branding plugin
 │       ├── src/               # Source code
@@ -25,8 +25,8 @@ headlamp-branding-plugin/
 │       └── README.md          # Plugin documentation
 ├── .github/
 │   └── workflows/             # CI/CD workflows
-├── package.json               # Workspace configuration
-└── pnpm-workspace.yaml        # pnpm workspace definition
+├── package.json               # Workspace configuration (bun workspaces)
+└── bun.lock                   # Bun lockfile
 ```
 
 ## Plugins
@@ -47,89 +47,70 @@ Custom branding plugin that provides OpenCenter logos and themes for Headlamp.
 ### Prerequisites
 
 - Node.js >= 20.0.0
-- pnpm >= 9.0.0
+- [Bun](https://bun.sh/) >= 1.0.0
 
 ### Installation
 
 ```bash
 # Install dependencies for all plugins
-pnpm install
+bun install
 ```
 
 ### Development
 
 ```bash
-# Start development server for all plugins
-pnpm run dev
-
 # Start development server for specific plugin
-pnpm --filter @opencenter/headlamp-plugin-branding run dev
+cd plugins/branding
+bun run start
 ```
 
 ### Building
 
 ```bash
-# Build all plugins
-pnpm run build
-
 # Build specific plugin
-pnpm --filter @opencenter/headlamp-plugin-branding run build
+cd plugins/branding
+bun run build
 ```
 
 ### Testing
 
 ```bash
-# Run tests for all plugins
-pnpm test
-
 # Run tests for specific plugin
-pnpm --filter @opencenter/headlamp-plugin-branding test
+cd plugins/branding
+bun run test
 ```
 
 ### Code Quality
 
 ```bash
-# Lint all plugins
-pnpm run lint
+# Lint
+cd plugins/branding
+bun run lint
 
-# Format all plugins
-pnpm run format
-
-# Check formatting
-pnpm run format:check
+# Format
+bun run format
 ```
 
 ## Workspace Commands
 
-The monorepo uses pnpm workspaces for managing multiple plugins.
+The monorepo uses bun workspaces for managing multiple plugins. Workspaces are defined in the root `package.json`:
 
-### Running Commands Across All Plugins
-
-```bash
-# Install dependencies
-pnpm install
-
-# Build all
-pnpm run build
-
-# Test all
-pnpm test
-
-# Lint all
-pnpm run lint
+```json
+{
+  "workspaces": ["plugins/*"]
+}
 ```
 
-### Running Commands for Specific Plugin
+### Running Commands for a Specific Plugin
 
 ```bash
 # Using --filter flag
-pnpm --filter @opencenter/headlamp-plugin-branding run build
-pnpm --filter @opencenter/headlamp-plugin-branding test
+bun run --filter @opencenter/headlamp-plugin-branding build
 
 # Or navigate to plugin directory
 cd plugins/branding
-pnpm run build
-pnpm test
+bun run build
+bun run test
 ```
 
 ## Adding New Plugins
@@ -171,7 +152,7 @@ touch src/index.tsx
 
 4. Install dependencies:
 ```bash
-pnpm install
+bun install
 ```
 
 5. The plugin will automatically be included in workspace commands.
@@ -181,19 +162,18 @@ pnpm install
 ### Pull Request Checks
 
 On every pull request, the CI pipeline runs:
-- Dependency installation
+- Dependency installation (`bun install`)
 - Linting (ESLint)
 - Format checking (Prettier)
 - Tests (Jest)
 - Build (Webpack)
-- Security audit (pnpm audit)
 
 ### Release Process
 
 1. Update version in plugin's package.json:
 ```bash
 cd plugins/branding
-pnpm version patch  # or minor, major
+npm version patch  # or minor, major
 ```
 
 2. Commit and push:
@@ -218,34 +198,32 @@ git push origin v1.0.1
 ## Monorepo Benefits
 
 - **Shared Configuration:** Common ESLint, Prettier, TypeScript configs
-- **Dependency Management:** Single pnpm-lock.yaml for all plugins
+- **Dependency Management:** Single `bun.lock` for all plugins
 - **Consistent Tooling:** Same build, test, and lint tools across plugins
 - **Atomic Changes:** Update multiple plugins in single PR
 - **Simplified CI/CD:** Single workflow for all plugins
 
 ## Troubleshooting
 
-### pnpm install fails
+### bun install fails
 
 **Solution:**
 ```bash
-# Clear pnpm cache
-pnpm store prune
-
 # Remove node_modules and lockfile
-rm -rf node_modules pnpm-lock.yaml plugins/*/node_modules
+rm -rf node_modules bun.lock plugins/*/node_modules
 
 # Reinstall
-pnpm install
+bun install
 ```
 
 ### Workspace command not finding plugin
 
 **Solution:**
-Verify plugin is listed in `pnpm-workspace.yaml`:
-```yaml
-packages:
-  - 'plugins/*'
+Verify plugin is listed in the root `package.json` workspaces field:
+```json
+{
+  "workspaces": ["plugins/*"]
+}
 ```
 
 ### Build fails for one plugin
@@ -253,18 +231,18 @@ packages:
 **Solution:**
 ```bash
 # Build specific plugin with verbose output
-pnpm --filter @opencenter/headlamp-plugin-branding run build --verbose
+cd plugins/branding
+bun run build
 
 # Check for TypeScript errors
-cd plugins/branding
-pnpm run lint
+bun run lint
 ```
 
 ## Contributing
 
 1. Create feature branch: `git checkout -b feature/my-feature`
 2. Make changes and add tests
-3. Run quality checks: `pnpm run lint && pnpm test`
+3. Run quality checks: `bun run lint && bun run test`
 4. Commit with conventional commits: `git commit -m "feat: add new feature"`
 5. Push and create pull request
 

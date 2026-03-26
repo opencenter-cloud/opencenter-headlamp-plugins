@@ -5,15 +5,12 @@ sidebar_label: Branding Plugin
 description: Headlamp branding plugin that registers custom OpenCenter logos and light/dark themes.
 doc_type: reference
 audience: "plugin developers, platform engineers"
-tags: [headlamp, branding, themes, plugin]
+tags: [headlamp, branding, themes, plugin, bun]
 ---
 
 # branding
 
-This is the default template README for [Headlamp Plugins](https://github.com/kubernetes-sigs/headlamp).
-
-- The description of your plugin should go here.
-- You should also edit the package.json file meta data (like name and description).
+OpenCenter branding plugin for [Headlamp](https://github.com/kubernetes-sigs/headlamp).
 
 ## Developing Headlamp plugins
 
@@ -24,6 +21,32 @@ For more information on developing Headlamp plugins, please refer to:
 - [UI Component Storybook](https://headlamp.dev/docs/latest/development/frontend/#storybook), pre-existing components you can use when creating your plugin.
 - [Plugin Examples](https://github.com/kubernetes-sigs/headlamp/tree/main/plugins/examples), Example plugins you can look at to see how it's done.
 
+## Prerequisites
+
+- Node.js >= 20.18.1 (Node 25 can break `headlamp-plugin` commands)
+- [Bun](https://bun.sh/) >= 1.0.0
+
+## Setup
+
+```bash
+# From the monorepo root
+bun install
+
+# Or from this directory
+cd plugins/branding
+bun install
+```
+
+## Development
+
+```bash
+bun run start    # Start dev server
+bun run build    # Production build
+bun run test     # Run tests
+bun run lint     # Lint
+bun run format   # Format
+```
+
 ## Branding Behavior
 
 - The plugin registers a custom app logo and two themes.
@@ -31,7 +54,3 @@ For more information on developing Headlamp plugins, please refer to:
   - `Light`
   - `Dark`
 - Logo assets are loaded from the plugin bundle path and adapt based on the selected light/dark theme name.
-
-## Node Version
-
-Headlamp plugin tooling expects Node `>=20.18.1`. Using Node 25 can break `headlamp-plugin` commands.
