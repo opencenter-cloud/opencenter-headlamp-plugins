@@ -1,0 +1,7 @@
+{
+  "name": "opencenter-headlamp-plugins",
+  "private": true,
+  "workspaces": [
+    "plugins/*"
+  ]
+}

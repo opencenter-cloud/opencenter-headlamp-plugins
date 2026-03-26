@@ -14,10 +14,7 @@ test-results/
 .vite/
 
 # Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+bun-debug.log*
 
 # Environment files
 .env
