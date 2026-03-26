@@ -10,13 +10,11 @@
  * - Correct components/themes passed to registration functions
  */
 
-import { jest } from '@jest/globals';
-
 // Mock the Headlamp plugin API before importing the plugin
-const mockRegisterAppLogo = jest.fn();
-const mockRegisterAppTheme = jest.fn();
+const mockRegisterAppLogo = vi.fn();
+const mockRegisterAppTheme = vi.fn();
 
-jest.mock('@kinvolk/headlamp-plugin/lib', () => ({
+vi.mock('@kinvolk/headlamp-plugin/lib', () => ({
   registerAppLogo: mockRegisterAppLogo,
   registerAppTheme: mockRegisterAppTheme,
 }));
@@ -25,7 +23,7 @@ describe('Plugin Registration Integration', () => {
   beforeAll(async () => {
     // Import the plugin entry point once for all tests
     // This executes the registration code
-    await import('../index');
+    await vi.importActual('../index');
   });
 
   it('registers logo component and themes when plugin loads', () => {
