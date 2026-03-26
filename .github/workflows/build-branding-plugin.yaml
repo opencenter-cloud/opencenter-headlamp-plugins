@@ -1,0 +1,64 @@
+name: Build Branding Plugin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "plugins/branding/**"
+      - ".github/workflows/build-branding-plugin.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "plugins/branding/**"
+      - ".github/workflows/build-branding-plugin.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/branding
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: .
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Type check
+        run: bun run tsc
+
+      - name: Test
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+
+      - name: Package
+        run: bun run package
+
+      - name: Prepare artifact
+        run: |
+          VERSION=$(jq -r .version package.json)
+          SRC_TARBALL=$(ls *.tar.gz)
+          mv "$SRC_TARBALL" "opencenter-headlamp-brand-plugin-${VERSION}.tar.gz"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencenter-headlamp-brand-plugin
+          path: plugins/branding/opencenter-headlamp-brand-plugin-*.tar.gz
+          if-no-files-found: error
