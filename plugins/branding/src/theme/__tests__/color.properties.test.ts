@@ -14,7 +14,7 @@
  */
 
 import fc from 'fast-check';
-import { hexToRgb, rgbToHex, blend, type HexColor } from '../color';
+import { blend, type HexColor,hexToRgb, rgbToHex } from '../color';
 
 // Helper to generate 6-character hex strings
 const hexString = () =>

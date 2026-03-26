@@ -10,9 +10,9 @@
  * Validates Requirements: 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11
  */
 
-import { OpenCenterCloudDay } from '../opencenter.light';
-import { OpenCenterAbyssalNight } from '../opencenter.dark';
 import type { AppTheme } from '@kinvolk/headlamp-plugin/lib';
+import { OpenCenterAbyssalNight } from '../opencenter.dark';
+import { OpenCenterCloudDay } from '../opencenter.light';
 
 /**
  * Helper function to validate that a theme has all required tokens defined

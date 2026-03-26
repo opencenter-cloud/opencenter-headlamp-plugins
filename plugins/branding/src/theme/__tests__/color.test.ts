@@ -12,12 +12,12 @@
  */
 
 import {
-  hexToRgb,
-  rgbToHex,
   blend,
-  mutedFromTokens,
-  selectedBackgroundFromTokens,
   type HexColor,
+  hexToRgb,
+  mutedFromTokens,
+  rgbToHex,
+  selectedBackgroundFromTokens,
 } from '../color';
 
 describe('hexToRgb', () => {
