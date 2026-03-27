@@ -209,7 +209,7 @@ describe('Theme Token Completeness Properties', () => {
     const themes: AppTheme[] = [OpenCenterCloudDay, OpenCenterAbyssalNight];
 
     // Validate each theme
-    themes.forEach((theme) => {
+    themes.forEach(theme => {
       const validation = validateThemeTokens(theme);
 
       // Assert that the theme is valid
@@ -245,7 +245,7 @@ describe('Theme Token Completeness Properties', () => {
   it('all registered themes have unique names', () => {
     const themes: AppTheme[] = [OpenCenterCloudDay, OpenCenterAbyssalNight];
 
-    const names = themes.map((theme) => theme.name);
+    const names = themes.map(theme => theme.name);
     const uniqueNames = new Set(names);
 
     expect(uniqueNames.size).toBe(names.length);
@@ -259,7 +259,7 @@ describe('Theme Token Completeness Properties', () => {
   it('all registered themes have valid base types', () => {
     const themes: AppTheme[] = [OpenCenterCloudDay, OpenCenterAbyssalNight];
 
-    themes.forEach((theme) => {
+    themes.forEach(theme => {
       expect(['light', 'dark']).toContain(theme.base);
     });
   });
@@ -283,7 +283,7 @@ describe('Theme Token Completeness Properties', () => {
     const referenceKeys = Object.keys(referenceTheme).sort();
 
     // Validate all other themes have the same keys
-    themes.slice(1).forEach((theme) => {
+    themes.slice(1).forEach(theme => {
       const themeKeys = Object.keys(theme).sort();
       expect(themeKeys).toEqual(referenceKeys);
 
@@ -323,7 +323,7 @@ describe('Theme Token Completeness Properties', () => {
   it('all color tokens use valid hex format', () => {
     const themes: AppTheme[] = [OpenCenterCloudDay, OpenCenterAbyssalNight];
 
-    themes.forEach((theme) => {
+    themes.forEach(theme => {
       // Check all color tokens
       const colorTokens = [
         theme.primary,
@@ -342,7 +342,7 @@ describe('Theme Token Completeness Properties', () => {
         theme.sidebar.actionBackground,
       ];
 
-      colorTokens.forEach((color) => {
+      colorTokens.forEach(color => {
         // Should match hex format (case-insensitive)
         expect(color).toMatch(/^#[0-9a-fA-F]{6}$/);
       });
@@ -357,7 +357,7 @@ describe('Theme Token Completeness Properties', () => {
   it('all radius tokens are positive numbers', () => {
     const themes: AppTheme[] = [OpenCenterCloudDay, OpenCenterAbyssalNight];
 
-    themes.forEach((theme) => {
+    themes.forEach(theme => {
       expect(typeof theme.radius).toBe('number');
       expect(theme.radius).toBeGreaterThan(0);
       expect(Number.isFinite(theme.radius)).toBe(true);

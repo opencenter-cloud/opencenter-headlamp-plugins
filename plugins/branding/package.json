@@ -9,7 +9,8 @@
     "extraDist": {
       "logo.png": "assets/logo.png",
       "logo_dark.png": "assets/logo_dark.png"
-    }
+    },
+    "i18n": []
   },
   "scripts": {
     "start": "headlamp-plugin start",

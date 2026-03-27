@@ -14,7 +14,7 @@
  */
 
 import fc from 'fast-check';
-import { blend, type HexColor,hexToRgb, rgbToHex } from '../color';
+import { blend, type HexColor, hexToRgb, rgbToHex } from '../color';
 
 // Helper to generate 6-character hex strings
 const hexString = () =>
@@ -40,7 +40,7 @@ const hexString = () =>
       ),
       { minLength: 6, maxLength: 6 }
     )
-    .map((arr) => arr.join(''));
+    .map(arr => arr.join(''));
 
 describe('Color Blending Properties', () => {
   /**
@@ -211,7 +211,7 @@ describe('Hex-RGB Conversion Properties', () => {
    */
   it('hexToRgb → rgbToHex preserves color value', () => {
     fc.assert(
-      fc.property(hexString(), (hex) => {
+      fc.property(hexString(), hex => {
         const color = `#${hex}` as HexColor;
 
         // Convert hex → RGB → hex

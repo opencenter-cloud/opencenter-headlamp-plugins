@@ -50,7 +50,7 @@ describe('Plugin Registration Integration', () => {
     const themeCalls = mockRegisterAppTheme.mock.calls;
 
     // Find the Light theme
-    const cloudDayTheme = themeCalls.find((call) => call[0]?.name === 'Light');
+    const cloudDayTheme = themeCalls.find(call => call[0]?.name === 'Light');
 
     expect(cloudDayTheme).toBeDefined();
     expect(cloudDayTheme?.[0]).toMatchObject({
@@ -66,9 +66,7 @@ describe('Plugin Registration Integration', () => {
     const themeCalls = mockRegisterAppTheme.mock.calls;
 
     // Find the Dark theme
-    const abyssalNightTheme = themeCalls.find(
-      (call) => call[0]?.name === 'Dark'
-    );
+    const abyssalNightTheme = themeCalls.find(call => call[0]?.name === 'Dark');
 
     expect(abyssalNightTheme).toBeDefined();
     expect(abyssalNightTheme?.[0]).toMatchObject({
@@ -84,7 +82,7 @@ describe('Plugin Registration Integration', () => {
     const themeCalls = mockRegisterAppTheme.mock.calls;
 
     // Verify both themes have complete structure
-    themeCalls.forEach((call) => {
+    themeCalls.forEach(call => {
       const theme = call[0];
 
       // Verify required top-level tokens
@@ -123,8 +121,8 @@ describe('Plugin Registration Integration', () => {
     const themeCalls = mockRegisterAppTheme.mock.calls;
 
     // Count light and dark themes
-    const lightThemes = themeCalls.filter((call) => call[0]?.base === 'light');
-    const darkThemes = themeCalls.filter((call) => call[0]?.base === 'dark');
+    const lightThemes = themeCalls.filter(call => call[0]?.base === 'light');
+    const darkThemes = themeCalls.filter(call => call[0]?.base === 'dark');
 
     expect(lightThemes).toHaveLength(1);
     expect(darkThemes).toHaveLength(1);

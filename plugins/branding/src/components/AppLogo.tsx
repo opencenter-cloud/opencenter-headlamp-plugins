@@ -28,12 +28,7 @@ function isDarkTheme(themeName = ''): boolean {
   return false;
 }
 
-const AppLogo: React.FC<AppLogoProps> = ({
-  logoType = 'large',
-  themeName = '',
-  className,
-  sx,
-}) => {
+const AppLogo: React.FC<AppLogoProps> = ({ logoType = 'large', themeName = '', className, sx }) => {
   const isDark = isDarkTheme(themeName);
   const logoSrc = isDark ? logoDark : logoLight;
   const logoHeight = logoType === 'small' ? 26 : 32;
