@@ -102,7 +102,58 @@ jobs:
             echo "tags=${IMAGE}:${VERSION},${IMAGE}:latest"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Build and push
+      - name: Build image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: opencenter-headlamp-plugin-branding:ci
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Headlamp refuses to execute a plugin whose directory has no package.json
+      # declaring a compatible @kinvolk/headlamp-plugin, so an image carrying only
+      # main.js would publish green, deploy as Running, serve main.js over HTTP 200,
+      # and still leave the UI on the stock theme behind
+      # "Warning. Incompatible plugins disabled: (branding)". Catch that here.
+      - name: Verify plugin image layout
+        run: |
+          set -euo pipefail
+          # Layout and ownership, checked inside the image. The final stage is alpine
+          # and has no node, so the manifest itself is parsed on the runner below.
+          docker run --rm --entrypoint sh opencenter-headlamp-plugin-branding:ci -ec '
+            test -f /plugins/branding/main.js
+            test -f /plugins/branding/package.json
+            test "$(stat -c %u:%g /plugins/branding/main.js)" = "100:101"
+            test "$(stat -c %u:%g /plugins/branding/package.json)" = "100:101"
+          '
+          # Headlamp's own predicate (frontend/src/plugin/index.ts):
+          #   semver.satisfies(semver.coerce(devDependencies["@kinvolk/headlamp-plugin"]) || "",
+          #                    ">=0.8.0-alpha.3")
+          # coerce() returns a release version built from the first X.Y.Z triple, so the
+          # accepted set is exactly the triples >= 0.8.0. Compared by hand because semver
+          # is not a dependency of this workspace and so is not resolvable here.
+          docker run --rm --entrypoint cat opencenter-headlamp-plugin-branding:ci \
+            /plugins/branding/package.json > /tmp/plugin-manifest.json
+          node -e '
+            const p = require("/tmp/plugin-manifest.json");
+            const sdk = (p.devDependencies || {})["@kinvolk/headlamp-plugin"];
+            const m = String(sdk || "").match(/(\d+)\.(\d+)\.(\d+)/);
+            if (!m) {
+              throw new Error(`Headlamp would disable this plugin: devDependencies["@kinvolk/headlamp-plugin"] = ${JSON.stringify(sdk)} has no X.Y.Z version to coerce`);
+            }
+            const [maj, min] = m.slice(1).map(Number);
+            if (maj === 0 && min < 8) {
+              throw new Error(`Headlamp would disable this plugin: coerced ${m[0]} does not satisfy >=0.8.0-alpha.3`);
+            }
+            console.log("plugin manifest OK:", p.name, p.version, "sdk", sdk, "-> coerced", m[0]);
+          '
+
+      - name: Push image
         id: push
         uses: docker/build-push-action@v6
         with:
