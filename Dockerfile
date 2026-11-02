@@ -27,7 +27,21 @@ RUN bun install --frozen-lockfile --ignore-scripts
 
 COPY plugins/branding plugins/branding
 
-RUN cd plugins/branding && bun run build
+# build, then use the SDK's own extractor rather than copying dist/ by hand.
+# extract is what `headlamp-plugin package` uses internally, and it is the only thing that
+# places package.json next to main.js. Headlamp's frontend gates every plugin on
+# devDependencies['@kinvolk/headlamp-plugin'] read from that package.json; without it the
+# plugin is reported "Incompatible plugins disabled" and never executes.
+#
+# Folder-of-packages mode (source = the plugins/ dir) names each output folder after the
+# plugin directory, giving /plugins-staging/branding/. Single-package mode instead flattens
+# into the output dir, which would lose the "branding" segment Headlamp scans for.
+#
+# Invoke the SDK bin directly rather than `bun x headlamp-plugin`: bun's runner tries to
+# resolve "headlamp-plugin" from the registry (404). With bun workspaces the bin symlink
+# lands in the owning package's node_modules/.bin, not the repo root.
+RUN bun run --cwd plugins/branding build \
+    && node plugins/branding/node_modules/.bin/headlamp-plugin extract plugins /plugins-staging
 
 FROM alpine:3.22
 
@@ -35,7 +49,8 @@ FROM alpine:3.22
 # even if this image later gains another group or user.
 RUN addgroup -S headlamp -g 101 && adduser -S headlamp -u 100 -G headlamp
 
-COPY --from=builder /build/plugins/branding/dist/ /plugins/branding/
+# extract already produced the final layout: /plugins-staging/branding/{main.js,logos,package.json}
+COPY --from=builder /plugins-staging/ /plugins/
 RUN chown -R 100:101 /plugins && chmod -R 755 /plugins
 
 USER 100:101
