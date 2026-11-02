@@ -27,3 +27,9 @@ Thumbs.db
 
 # Local temp directory
 tmp/
+
+
+.omp
+
+# Local working documents
+install-plan.md

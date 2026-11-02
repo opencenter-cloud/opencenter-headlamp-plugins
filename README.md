@@ -42,6 +42,15 @@ Custom branding plugin that provides OpenCenter logos and themes for Headlamp.
 
 **Documentation:** See [plugins/branding/README.md](plugins/branding/README.md)
 
+## Target Headlamp Version
+
+Plugins are built against `@kinvolk/headlamp-plugin` **^0.14.0**, the SDK bundled with
+**Headlamp 0.45.0** — the version deployed by `openCenter-gitops-base` branch `2026.03-rc`
+(`applications/base/services/headlamp/`, Helm chart `0.45.0`). Headlamp externalizes React, MUI,
+and its own frontend libraries at plugin build time and provides them at runtime, so the SDK must
+track the deployed Headlamp rather than floating to the newest release. See
+[plugins/branding/README.md](plugins/branding/README.md#target-headlamp-version) for the version map.
+
 ## Getting Started
 
 ### Prerequisites
@@ -123,23 +132,40 @@ mkdir -p plugins/my-new-plugin
 cd plugins/my-new-plugin
 ```
 
-2. Initialize package.json:
+2. Initialize package.json (mirrors the `@kinvolk/headlamp-plugin` template — the SDK drives
+   build/test/lint via vite + vitest, not webpack/jest):
 ```json
 {
   "name": "@opencenter/headlamp-plugin-my-new-plugin",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "description": "OpenCenter Headlamp plugin",
   "scripts": {
-    "dev": "webpack --mode development --watch",
-    "build": "webpack --mode production",
-    "test": "jest",
-    "lint": "eslint src --ext .ts,.tsx",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "start": "headlamp-plugin start",
+    "build": "headlamp-plugin build",
+    "format": "headlamp-plugin format",
+    "lint": "headlamp-plugin lint",
+    "lint-fix": "headlamp-plugin lint --fix",
+    "package": "headlamp-plugin package",
+    "tsc": "headlamp-plugin tsc",
+    "storybook": "headlamp-plugin storybook",
+    "storybook-build": "headlamp-plugin storybook-build",
+    "test": "headlamp-plugin test",
+    "i18n": "headlamp-plugin i18n"
+  },
+  "prettier": "@headlamp-k8s/eslint-config/prettier-config",
+  "eslintConfig": {
+    "extends": ["@headlamp-k8s", "prettier", "plugin:jsx-a11y/recommended"]
+  },
+  "overrides": {
+    "typescript": "5.6.2"
+  },
+  "devDependencies": {
+    "@kinvolk/headlamp-plugin": "^0.14.0"
   },
   "peerDependencies": {
-    "@kinvolk/headlamp-plugin": "^0.13.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "@mui/material": "^5.0.0"
   }
 }
 ```
@@ -161,12 +187,14 @@ bun install
 
 ### Pull Request Checks
 
-On every pull request, the CI pipeline runs:
+On every pull request touching `plugins/branding/**`, the CI pipeline
+(`.github/workflows/build-branding-plugin.yaml`) runs:
 - Dependency installation (`bun install`)
-- Linting (ESLint)
-- Format checking (Prettier)
-- Tests (Jest)
-- Build (Webpack)
+- Linting (`bun run lint` — ESLint via `headlamp-plugin`)
+- Type check (`bun run tsc`)
+- Tests (`bun run test` — vitest)
+- Build (`bun run build` — vite)
+- Package (`bun run package` — tarball artifact)
 
 ### Release Process
 

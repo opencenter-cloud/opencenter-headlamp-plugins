@@ -26,6 +26,22 @@ For more information on developing Headlamp plugins, please refer to:
 - Node.js >= 20.18.1 (Node 25 can break `headlamp-plugin` commands)
 - [Bun](https://bun.sh/) >= 1.0.0
 
+## Target Headlamp Version
+
+This plugin is built against `@kinvolk/headlamp-plugin` **0.14.0**, the plugin SDK bundled with
+**Headlamp 0.45.0** — the version deployed by `openCenter-gitops-base` branch `2026.03-rc`
+(`applications/base/services/headlamp/`, Helm chart `0.45.0`).
+
+| openCenter-gitops-base branch | Headlamp chart/appVersion | `@kinvolk/headlamp-plugin` |
+| ----------------------------- | ------------------------- | -------------------------- |
+| `2026.03-rc`                  | 0.45.0                    | ^0.14.0                    |
+
+Keep the SDK pinned to the SDK version bundled with the deployed Headlamp. React, MUI, and the
+Headlamp frontend libraries are externalized at build time and resolved from the host app at
+runtime, so an SDK newer than the deployed Headlamp can compile and pass tests while failing to
+load in the browser. When the base repo bumps Headlamp, bump the SDK here in step with it
+(chart `0.46.0` and later also ship SDK `0.14.0`, so no change is needed for that bump).
+
 ## Setup
 
 ```bash

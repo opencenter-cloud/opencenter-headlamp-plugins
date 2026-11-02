@@ -28,5 +28,5 @@ Thumbs.db
 # Local temp directory
 tmp/
 
-# local build
-openCenter-0.0.4.tar.gz
+# local build artifacts
+*.tar.gz
