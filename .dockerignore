@@ -1,0 +1,27 @@
+# Keep the build context small and reproducible: the image is built from source plus the
+# lockfile, never from local build output or dependencies.
+.git
+.github
+.omp
+node_modules
+**/node_modules
+plugins/*/dist
+plugins/branding/dist
+plugins/branding/e2e
+plugins/branding/src/__tests__
+plugins/branding/src/**/__tests__
+plugins/branding/*.tar.gz
+plugins/branding/playwright.config.ts
+plugins/branding/jest.config.js
+plugins/branding/.vscode
+**/*.test.ts
+**/*.test.tsx
+coverage
+playwright-report
+test-results
+bun-debug.log*
+*.tar.gz
+.DS_Store
+README.md
+**/README.md
+install-plan.md

@@ -6,14 +6,21 @@ on:
     paths:
       - "plugins/branding/**"
       - ".github/workflows/build-branding-plugin.yaml"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "bun.lock"
   pull_request:
     branches: [main]
     paths:
       - "plugins/branding/**"
       - ".github/workflows/build-branding-plugin.yaml"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "bun.lock"
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
@@ -62,3 +69,64 @@ jobs:
           name: opencenter-headlamp-brand-plugin
           path: plugins/branding/opencenter-headlamp-brand-plugin-*.tar.gz
           if-no-files-found: error
+
+  publish-image:
+    name: Publish plugin image
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image name and tags
+        id: meta
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          VERSION=$(jq -r .version plugins/branding/package.json)
+          IMAGE="ghcr.io/$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')/opencenter-headlamp-plugin-branding"
+          {
+            echo "image=$IMAGE"
+            echo "tags=${IMAGE}:${VERSION},${IMAGE}:latest"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Record image reference
+        run: |
+          {
+            echo "### Plugin image published"
+            echo ""
+            echo "- Image: \`${{ steps.meta.outputs.image }}\`"
+            echo "- Digest: \`${{ steps.push.outputs.digest }}\`"
+            echo ""
+            echo "Pin this digest in the cluster overlay's Headlamp values override:"
+            echo ""
+            echo "\`\`\`yaml"
+            echo "initContainers:"
+            echo "  - name: fetch-plugins"
+            echo "    image: ${{ steps.meta.outputs.image }}@${{ steps.push.outputs.digest }}"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
